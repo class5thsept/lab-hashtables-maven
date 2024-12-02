@@ -192,9 +192,11 @@ public class ProbedHashTable<K, V> implements HashTable<K, V> {
       } // if reporter != null
       throw new IndexOutOfBoundsException("Invalid key: " + key);
     } else {
-      if (REPORT_BASIC_CALLS && (reporter != null)) {
+      if(pair.key().equals(key)){
+        if (REPORT_BASIC_CALLS && (reporter != null)) {
         reporter.report("get(" + key + ") => " + pair.value());
-      } // if reporter != null
+        } // if reporter != null
+     }
       return pair.value();
     } // get
   } // get(K)
@@ -245,14 +247,16 @@ public class ProbedHashTable<K, V> implements HashTable<K, V> {
     int index = find(key);
     if (this.pairs[index] != null) {
       result = ((Pair<K, V>) this.pairs[index]).value();
-    } // if
+    } else {
+      ++this.size;
+    }
     this.pairs[index] = new Pair<K, V>(key, value);
     // Report activity, if appropriate
     if (REPORT_BASIC_CALLS && (reporter != null)) {
       reporter.report("pairs[" + index + "] = " + key + ":" + value);
     } // if reporter != null
     // Note that we've incremented the size.
-    ++this.size;
+    
     // And we're done
     return result;
   } // set(K, V)
@@ -273,11 +277,6 @@ public class ProbedHashTable<K, V> implements HashTable<K, V> {
    *
    * @return an iterator for the values.
    */
-  public Iterator<V> values() {
-    return MiscUtils.transform(this.iterator(), (pair) -> pair.value());
-  } // values()
-
-  // +------------------+--------------------------------------------
   // | Iterator methods |
   // +------------------+
 
@@ -382,8 +381,14 @@ public class ProbedHashTable<K, V> implements HashTable<K, V> {
    * @return the aforementioned index.
    */
   int find(K key) {
-    return Math.abs(key.hashCode()) % this.pairs.length;
-  } // find(K)
+     return Math.abs(key.hashCode()) % this.pairs.length;
+   } // find(K)
+
+  @Override
+  public Iterator<V> values() {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'values'");
+  }
 
 } // class ProbedHashTable<K, V>
 
